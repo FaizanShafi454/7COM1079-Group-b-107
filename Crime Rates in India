@@ -1,0 +1,112 @@
+# --------- set working folder (update if needed) ----------
+setwd("E:/Work/R_Language/Bharat")
+
+# --------- load packages (install if needed) --------------
+if(!require(tidyverse)) install.packages("tidyverse"); library(tidyverse)
+if(!require(car)) install.packages("car"); library(car)
+if(!require(stringr)) install.packages("stringr"); library(stringr)
+
+# --------- load data (suppress column type messages) ------
+df <- read_csv("crimes_against_women_2001-2014.csv", show_col_types = FALSE)
+
+# --------- quick peek --------------------------
+# print(head(df))
+# print(names(df))
+
+# --------- CLEANING STEPS ----------------------------------
+# 1) Trim whitespace from key columns and standardise case
+df <- df %>%
+  mutate(
+    STATE_UT = str_squish(as.character(`STATE/UT`)),
+    STATE_UT = str_to_title(STATE_UT),        # "ANDHRA PRADESH" -> "Andhra Pradesh"
+    DISTRICT = str_squish(as.character(DISTRICT)),
+    DISTRICT_up = str_to_upper(DISTRICT)      # uppercase helper for TOTAL detection
+  )
+
+# 2) Remove rows that are TOTAL / Total / contain "TOTAL" in the DISTRICT (state-level aggregates)
+df <- df %>% filter(!str_detect(DISTRICT_up, "TOTAL"))
+
+# 3) (Optional) Remove rows where DISTRICT is NA or empty after trimming
+df <- df %>% filter(!is.na(DISTRICT) & DISTRICT != "")
+
+# 4) Convert target variable to numeric safely (remove commas or stray characters)
+#    Use the exact column name in your CSV: "Cruelty by Husband or his Relatives"
+df <- df %>%
+  mutate(
+    cruelty_raw = as.character(`Cruelty by Husband or his Relatives`),
+    cruelty = as.numeric(str_replace_all(cruelty_raw, ",", ""))  # remove commas if any
+  )
+
+# 5) Save cleaned dataset for record (so you submit the cleaned version if required)
+write_csv(df, "crimes_against_women_2001-2014_cleaned.csv")
+
+# --------- define region lists (use Title Case because we used str_to_title) ----------
+north_states <- c("Jammu & Kashmir", "Himachal Pradesh", "Punjab", "Haryana",
+                  "Delhi", "Uttar Pradesh", "Uttarakhand", "Rajasthan")
+
+south_states <- c("Tamil Nadu", "Kerala", "Karnataka",
+                  "Andhra Pradesh", "Telangana", "Puducherry")
+
+# --------- create region variable -----------------------------------------------
+df <- df %>%
+  mutate(
+    region = case_when(
+      STATE_UT %in% north_states ~ "North",
+      STATE_UT %in% south_states ~ "South",
+      TRUE ~ NA_character_
+    )
+  )
+
+# Keep only North and South rows for the comparison
+df_ns <- df %>% filter(!is.na(region))
+
+# --------- quick counts (confirm groups) -------------
+group_counts <- df_ns %>% count(region)
+print(group_counts)
+write_csv(group_counts, "group_counts.csv")
+
+# --------- ensure cruelty is numeric and drop NA cruelty rows -------------
+df_ns <- df_ns %>% mutate(cruelty = as.numeric(cruelty))
+df_ns <- df_ns %>% filter(!is.na(cruelty))
+
+# --------- Exploratory plots -----------------------------------------------
+library(ggplot2)
+
+# Histogram faceted by region (use log scale view if needed)
+p2 <- ggplot(df_ns, aes(x = cruelty)) +
+  geom_histogram(binwidth = 10) +
+  facet_wrap(~region, scales = "free_x") +
+  labs(title = "Distribution of cruelty counts by region", x = "Cruelty (counts)", y = "Frequency") +
+  theme_minimal()
+ggsave("histogram_cruelty.png", plot = p2, width = 9, height = 4)
+
+
+
+# --------- Statistical tests: Welch t-test and Mann-Whitney -------------
+t_welch <- t.test(cruelty ~ region, data = df_ns, var.equal = FALSE)
+wilcox_res <- wilcox.test(cruelty ~ region, data = df_ns)
+
+# Save test outputs
+sink("stat_test_results.txt")
+cat("Welch two-sample t-test:\n"); print(t_welch)
+cat("\n\nMann-Whitney U test:\n"); print(wilcox_res)
+sink()
+
+# print to console
+print(t_welch)
+print(wilcox_res)
+
+# --------- summary statistics (means, medians, sd) -------------
+summary_stats <- df_ns %>% group_by(region) %>%
+  summarise(n = n(),
+            mean = mean(cruelty, na.rm=TRUE),
+            median = median(cruelty, na.rm=TRUE),
+            sd = sd(cruelty, na.rm=TRUE))
+print(summary_stats)
+write_csv(summary_stats, "summary_stats_by_region.csv")
+
+message("Script finished. Clean file: crimes_against_women_2001-2014_cleaned.csv")
+message("Plots: boxplot_cruelty.png, histogram_cruelty.png, qqplots_cruelty.png.")
+message("Outputs: assumption_tests.txt, stat_test_results.txt, summary_stats_by_region.csv, group_counts.csv")
+
+
