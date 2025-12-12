@@ -1,0 +1,40 @@
+1.	Evaluation – group’s experience at 7COM1079
+1.1.	What went well (75 words)
+
+Working in a team helped us understand the project better, and splitted the tasks fairly. We talked regularly to stay on the same page and used Git to share files. We carefully checked the dataset, fixed issues like TOTAL rows, and did the full analysis in R. Creating graphs, running tests, and explaining the results improved our confidence in using R. Overall, the work went smoothly and putting things together was easy because we used the tempelate from start.
+
+
+1.2.	Points for improvement (75 words)
+
+At start, we had some tough time regarding understanding the dataset and choosing the right statistical tests. We also spent extra time solving R issues such as reading the CSV file, cleaning the data, and removing unnecessary rows. With more planning and early checks, we could have avoided some delays. Learning more about R packages and documentation would also help us work faster in future projects and also Mann- Whitey test earlier would have saved some time.
+
+
+1.3.	Group’s time management (50 words)
+
+We tried to keep work in schedule ans splitted tasks early, like cleaning data, making graphs, testing hypotheses, and writing the report. Beginning took longer time learning the dataset  and things like, forming the hypothesis and improving the plots. In future work, spending more time reviewing the results could improve our workflow.
+
+
+1.4.	Project’s overall judgement (50 words)
+
+We met the project goals by answering the research questions and testing the hypotheses. The analysis was suitable, and the result was clearly supported by statistical evidence. Doing the practical work together helped us better understand, how to manage and analyse data effectively.
+
+
+1.5.	Note any changes to group since original allocation if applicable. Add new or amended GitHub Ids for new members (75 words, write only if applies to your group arrangements)
+1.6.	Comment on the GitHub log output (50 words) 
+
+We used Github to work together as a team. Each member added their files correctly. The commit history shows our progress from adding the data to finishing the repport. You can see our main steps in Appendix B. It helped us stay organised and share our work properly.
+ 
+2.	Conclusions
+2.1.	Results explained (75 words)
+
+Our results and analysis that we did found a clear difference between North and South India’s Cruelty cases. North India has more reported cruelty cases, with middle value of 14, than the South India, with middle value of 5. The statistical test gave us a very small p-value, which means that the difference is real and not by chance. And yes, there is a significant difference in domestic violence rates between the two regions based on 2001-2014 data, which satisfies our research question.
+
+2.2.	Interpretation of the results (75 words)
+
+Our results found that North India reports more cruelty cases, that could mean more violence in north or may be due to stronger reporting systems, better awareness, women their report more cases. The increasing trend might also reflect, which changes social attitudes and easier access for a legal support. These regional differences show the importance of tailored policies and intervention strategies.
+
+
+2.3.	Reasons and/or implications for future work, limitations of your study (50 words)
+
+Our study uses reported crime data, which may not include unreported cases due to cultural or social barriers. Future work could add socio-economic data, qualitative research, talking to women directly,  or machine learning models to make better policies for each region.
+
